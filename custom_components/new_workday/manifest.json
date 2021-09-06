@@ -2,7 +2,7 @@
   "domain": "new_workday",
   "name": "new Workday",
   "documentation": "",
-  "version": "v0.0.01",
+  "version": "v0.0.02",
   "requirements": ["holidays==0.11.2"],
   "codeowners": ["@Ludy87"]
 }
