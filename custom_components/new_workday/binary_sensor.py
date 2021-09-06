@@ -111,6 +111,8 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
                 _LOGGER.debug(_date.strftime("%Y-%m-%d"))
     except TypeError:
         _LOGGER.debug("No custom holiday weeks or invalid holiday weeks")
+    except IndexError:
+        _LOGGER.debug("IndexError: custom holiday weeks syntax \"2021-01-01:2021-12-31\"")
 
     # Add custom holidays
     try:
@@ -209,7 +211,6 @@ class IsWorkdaySensor(BinarySensorEntity):
             return True
 
         return False
-            
 
     @property
     def extra_state_attributes(self):
