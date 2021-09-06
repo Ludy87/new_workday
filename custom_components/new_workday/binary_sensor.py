@@ -158,12 +158,13 @@ def get_date(date):
 class IsWorkdaySensor(BinarySensorEntity):
     """Implementation of a Workday sensor."""
 
-    def __init__(self, obj_holidays, workdays, excludes, days_offset, name):
+    def __init__(self, obj_holidays, workdays, excludes, days_offset, name, days_range):
         """Initialize the Workday sensor."""
         self._name = name
         self._obj_holidays = obj_holidays
         self._workdays = workdays
         self._excludes = excludes
+        self._days_range = days_range
         self._days_offset = days_offset
         self._state = None
 
@@ -195,12 +196,22 @@ class IsWorkdaySensor(BinarySensorEntity):
 
         return False
 
+    def is_days_range(self, day, now):
+        if day in self._days_range:
+            return True
+        if "holiday" in self._days_range and now in self._obj_holidays:
+            return True
+
+        return False
+            
+
     @property
     def extra_state_attributes(self):
         """Return the attributes of the entity."""
         # return self._attributes
         return {
             CONF_WORKDAYS: self._workdays,
+            CONF_DATE_RANGE: self._days_range,
             CONF_EXCLUDES: self._excludes,
             CONF_OFFSET: self._days_offset,
         }
@@ -219,4 +230,7 @@ class IsWorkdaySensor(BinarySensorEntity):
             self._state = True
 
         if self.is_exclude(day_of_week, date):
+            self._state = False
+
+        if self.is_include_list(day_of_week, date):
             self._state = False
