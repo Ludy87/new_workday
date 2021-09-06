@@ -232,5 +232,5 @@ class IsWorkdaySensor(BinarySensorEntity):
         if self.is_exclude(day_of_week, date):
             self._state = False
 
-        if self.is_include_list(day_of_week, date):
+        if self.is_days_range(day_of_week, date):
             self._state = False
