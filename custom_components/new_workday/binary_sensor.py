@@ -137,7 +137,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         _LOGGER.debug("%s %s", date, name)
 
     add_entities(
-        [IsWorkdaySensor(obj_holidays, workdays, excludes, days_offset, sensor_name)],
+        [IsWorkdaySensor(obj_holidays, workdays, excludes, days_offset, sensor_name, date_range)],
         True,
     )
 
