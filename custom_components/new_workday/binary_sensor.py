@@ -22,6 +22,7 @@ CONF_EXCLUDES = "excludes"
 CONF_OFFSET = "days_offset"
 CONF_ADD_HOLIDAYS = "add_holidays"
 CONF_REMOVE_HOLIDAYS = "remove_holidays"
+CONF_DATE_RANGE = "date_range"
 
 # By default, Monday - Friday are workdays
 DEFAULT_WORKDAYS = ["mon", "tue", "wed", "thu", "fri"]
@@ -63,6 +64,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         ),
         vol.Optional(CONF_ADD_HOLIDAYS): vol.All(cv.ensure_list, [cv.string]),
         vol.Optional(CONF_REMOVE_HOLIDAYS): vol.All(cv.ensure_list, [cv.string]),
+        vol.Optional(CONF_DATE_RANGE): vol.All(cv.ensure_list, [cv.string]),
     }
 )
 
@@ -71,6 +73,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Workday sensor."""
     add_holidays = config.get(CONF_ADD_HOLIDAYS)
     remove_holidays = config.get(CONF_REMOVE_HOLIDAYS)
+    date_range = config.get(CONF_DATE_RANGE)
     country = config[CONF_COUNTRY]
     days_offset = config[CONF_OFFSET]
     excludes = config[CONF_EXCLUDES]
@@ -93,6 +96,12 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
                 "There is no province/state %s in country %s", province, country
             )
             return
+
+    # Add custom holidays
+    try:
+        obj_holidays.append(add_holidays)
+    except TypeError:
+        _LOGGER.debug("No custom holidays or invalid holidays")
 
     # Add custom holidays
     try:

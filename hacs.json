@@ -3,6 +3,6 @@
     "domains": ["binary_sensor"],
     "country": "DE",
     "render_readme": "True",
-    "homeassistant": "0.99.9",
+    "homeassistant": "2021.9.0",
     "iot_class": "Cloud Polling"
   }
