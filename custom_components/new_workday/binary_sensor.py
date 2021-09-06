@@ -23,7 +23,7 @@ CONF_EXCLUDES = "excludes"
 CONF_OFFSET = "days_offset"
 CONF_ADD_HOLIDAYS = "add_holidays"
 CONF_REMOVE_HOLIDAYS = "remove_holidays"
-CONF_DATE_RANGE = "date_range"
+CONF_HOLIDAYS_RANGE = "holidays_range"
 
 # By default, Monday - Friday are workdays
 DEFAULT_WORKDAYS = ["mon", "tue", "wed", "thu", "fri"]
@@ -65,7 +65,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         ),
         vol.Optional(CONF_ADD_HOLIDAYS): vol.All(cv.ensure_list, [cv.string]),
         vol.Optional(CONF_REMOVE_HOLIDAYS): vol.All(cv.ensure_list, [cv.string]),
-        vol.Optional(CONF_DATE_RANGE): cv.string,
+        vol.Optional(CONF_HOLIDAYS_RANGE): vol.All(cv.ensure_list, [cv.string]),
     }
 )
 
@@ -74,7 +74,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Workday sensor."""
     add_holidays = config.get(CONF_ADD_HOLIDAYS)
     remove_holidays = config.get(CONF_REMOVE_HOLIDAYS)
-    date_range = config.get(CONF_DATE_RANGE)
+    holidays_range = config.get(CONF_HOLIDAYS_RANGE)
     country = config[CONF_COUNTRY]
     days_offset = config[CONF_OFFSET]
     excludes = config[CONF_EXCLUDES]
@@ -98,13 +98,19 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
             )
             return
 
-    # Add custom
+    # Add custom holiday weeks
     try:
-        for dr in date_range:
-            _LOGGER.warning(dr)
-#        obj_holidays.append(add_holidays)
+        for holiday_range in holidays_range:
+            dr = holiday_range.split(":")
+            start = datetime.datetime.strptime(dr[0], "%Y-%m-%d")
+            end = datetime.datetime.strptime(dr[1], "%Y-%m-%d")
+            date_generated = [start + datetime.timedelta(days=x) for x in range(0, (end-start).days +1)]
+
+            obj_holidays.append(date_generated)
+            for _date in date_generated:
+                _LOGGER.debug(_date.strftime("%Y-%m-%d"))
     except TypeError:
-        _LOGGER.debug("No custom holidays or invalid holidays")
+        _LOGGER.debug("No custom holiday weeks or invalid holiday weeks")
 
     # Add custom holidays
     try:
@@ -137,7 +143,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         _LOGGER.debug("%s %s", date, name)
 
     add_entities(
-        [IsWorkdaySensor(obj_holidays, workdays, excludes, days_offset, sensor_name, date_range)],
+        [IsWorkdaySensor(obj_holidays, workdays, excludes, days_offset, sensor_name, holidays_range)],
         True,
     )
 
@@ -158,13 +164,13 @@ def get_date(date):
 class IsWorkdaySensor(BinarySensorEntity):
     """Implementation of a Workday sensor."""
 
-    def __init__(self, obj_holidays, workdays, excludes, days_offset, name, days_range):
+    def __init__(self, obj_holidays, workdays, excludes, days_offset, name, holidays_range):
         """Initialize the Workday sensor."""
         self._name = name
         self._obj_holidays = obj_holidays
         self._workdays = workdays
         self._excludes = excludes
-        self._days_range = days_range
+        self._holidays_range = holidays_range
         self._days_offset = days_offset
         self._state = None
 
@@ -196,10 +202,10 @@ class IsWorkdaySensor(BinarySensorEntity):
 
         return False
 
-    def is_days_range(self, day, now):
-        if day in self._days_range:
+    def is_holidays_range(self, day, now):
+        if day in self._holidays_range:
             return True
-        if "holiday" in self._days_range and now in self._obj_holidays:
+        if "holiday" in self._holidays_range and now in self._obj_holidays:
             return True
 
         return False
@@ -211,7 +217,7 @@ class IsWorkdaySensor(BinarySensorEntity):
         # return self._attributes
         return {
             CONF_WORKDAYS: self._workdays,
-            CONF_DATE_RANGE: self._days_range,
+            CONF_HOLIDAYS_RANGE: self._holidays_range,
             CONF_EXCLUDES: self._excludes,
             CONF_OFFSET: self._days_offset,
         }
@@ -232,5 +238,5 @@ class IsWorkdaySensor(BinarySensorEntity):
         if self.is_exclude(day_of_week, date):
             self._state = False
 
-        if self.is_days_range(day_of_week, date):
+        if self.is_holidays_range(day_of_week, date):
             self._state = False
