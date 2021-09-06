@@ -65,7 +65,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         ),
         vol.Optional(CONF_ADD_HOLIDAYS): vol.All(cv.ensure_list, [cv.string]),
         vol.Optional(CONF_REMOVE_HOLIDAYS): vol.All(cv.ensure_list, [cv.string]),
-        vol.Optional(CONF_DATE_RANGE): vol.All(cv.ensure_list, [cv.string]),
+        vol.Optional(CONF_DATE_RANGE): cv.string,
     }
 )
 
