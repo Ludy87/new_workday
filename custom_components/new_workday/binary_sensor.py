@@ -100,8 +100,8 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     # Add custom
     try:
-        for dr in date_range[0].split(':'):
-            for s in dr:
+        for dr in date_range:
+            for s in dr.split(':'):
                 _LOGGER.warning(s)
 #        obj_holidays.append(add_holidays)
     except TypeError:
