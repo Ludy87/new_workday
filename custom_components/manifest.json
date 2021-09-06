@@ -1,0 +1,8 @@
+{
+  "domain": "new_workday",
+  "name": "new Workday",
+  "documentation": "",
+  "version": "v0.0.0",
+  "requirements": ["holidays==0.11.2"],
+  "codeowners": ["@Ludy87"]
+}
