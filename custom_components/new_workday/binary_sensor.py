@@ -1,5 +1,6 @@
 """Sensor to indicate whether the current day is a workday."""
 from datetime import timedelta
+import datetime
 import logging
 from typing import Any
 
@@ -97,9 +98,11 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
             )
             return
 
-    # Add custom holidays
+    # Add custom
     try:
-        obj_holidays.append(add_holidays)
+        for dr in date_range.split(':'):
+            _LOGGER(dr)
+#        obj_holidays.append(add_holidays)
     except TypeError:
         _LOGGER.debug("No custom holidays or invalid holidays")
 
