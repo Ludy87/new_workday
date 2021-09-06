@@ -112,7 +112,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     except TypeError:
         _LOGGER.debug("No custom holiday weeks or invalid holiday weeks")
     except IndexError:
-        _LOGGER.debug("IndexError: custom holiday weeks syntax \"2021-01-01:2021-12-31\"")
+        _LOGGER.warning("IndexError: custom holiday weeks syntax \"2021-01-01:2021-12-31\"")
 
     # Add custom holidays
     try:
